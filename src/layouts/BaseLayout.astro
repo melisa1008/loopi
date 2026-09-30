@@ -2,7 +2,7 @@
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import type { Lang } from '../lib/i18n';
-const { lang, title = 'Loopi — Comparte tu mundo', description = 'Una comunidad para compartir historias y conectar' } = Astro.props as { lang: Lang; title?: string; description?: string };
+const { lang, title = 'Loopi — Comparte tu mundo', description = 'Una comunidad para compartir historias y conectar', manifest = '/manifest.webmanifest', appName = 'Loopi', serviceWorker = '/sw.js' } = Astro.props as { lang: Lang; title?: string; description?: string; manifest?: string; appName?: string; serviceWorker?: string };
 ---
 <!doctype html>
 <html lang={lang}>
@@ -13,8 +13,8 @@ const { lang, title = 'Loopi — Comparte tu mundo', description = 'Una comunida
     <meta name="theme-color" content="#7655ed" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="Loopi" />
-    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="apple-mobile-web-app-title" content={appName} />
+    <link rel="manifest" href={manifest} />
     <link rel="apple-touch-icon" href="/loopi-icon.svg" />
     <title>{title}</title>
   </head>
@@ -24,9 +24,9 @@ const { lang, title = 'Loopi — Comparte tu mundo', description = 'Una comunida
     <Footer lang={lang} />
   </body>
 </html>
-<script>
+<script define:vars={{ serviceWorker }}>
   if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => navigator.serviceWorker.getRegistrations().then(registrations => Promise.all(registrations.map(registration => registration.unregister()))));
+    window.addEventListener('load', () => navigator.serviceWorker.register(serviceWorker));
   }
 </script>
 <style is:global>

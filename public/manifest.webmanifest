@@ -1,10 +1,11 @@
 {
-  "name": "Loopi — Comparte tu mundo",
+  "id": "/es/",
+  "name": "Loopi — Historias cuidadas",
   "short_name": "Loopi",
   "description": "Una comunidad moderada para compartir y leer historias.",
   "start_url": "/es/",
   "display": "standalone",
-  "background_color": "#f8f7fc",
+  "background_color": "#120f1f",
   "theme_color": "#7655ed",
   "lang": "es",
   "icons": [
