@@ -6,43 +6,48 @@ import { categories } from '../../lib/loopi';
 export function getStaticPaths() { return languages.map(lang => ({ params: { lang } })); }
 const { lang } = Astro.params;
 if (!isLang(lang)) return Astro.redirect('/es/');
-const stories = (await getCollection('stories', ({ data }) => !data.draft)).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const copy = {
+  es: { title: 'Loopi — Tu mundo tiene historias', eyebrow: 'Historias que merecen un lugar', heroStart: 'Tu mundo tiene', heroEnd: 'historias.', lead: 'Loopi es un rincón seguro para leer, sentir y compartir historias. Cada envío se revisa con cuidado antes de aparecer.', submit: 'Cuenta tu historia', explore: 'Explorar historias', anonymous: '✦ Puedes publicar con tu nombre, seudónimo o de forma anónima.', quote: 'Hay historias que no cambian el mundo entero, pero sí pueden cambiarle el día a alguien.', community: 'Una historia de la comunidad', featuredEyebrow: 'Elegidas con cariño', featured: 'Historias destacadas', all: 'Ver todas →', themesEyebrow: 'Encuentra tu rincón', themes: 'Explora por tema', allThemes: 'Todos los temas →', recentEyebrow: 'Recién publicadas', recent: 'Historias nuevas', voiceEyebrow: 'Tu voz importa', voice: '¿Hay una historia que quieras contar?', voiceText: 'Envía tu texto sin crear una cuenta. Tú eliges si aparece con tu nombre, seudónimo o de forma anónima.', send: 'Enviar mi historia →' },
+  en: { title: 'Loopi — Your world has stories', eyebrow: 'Stories deserve a place', heroStart: 'Your world has', heroEnd: 'stories.', lead: 'Loopi is a safe corner to read, feel, and share stories. Every submission is reviewed with care before it appears.', submit: 'Share your story', explore: 'Explore stories', anonymous: '✦ Publish with your name, a pseudonym, or anonymously.', quote: 'Some stories do not change the whole world, but they can change someone’s day.', community: 'A community story', featuredEyebrow: 'Chosen with care', featured: 'Featured stories', all: 'See all →', themesEyebrow: 'Find your corner', themes: 'Explore by theme', allThemes: 'All themes →', recentEyebrow: 'Just published', recent: 'New stories', voiceEyebrow: 'Your voice matters', voice: 'Is there a story you want to tell?', voiceText: 'Send your text without creating an account. You choose whether it appears with your name, a pseudonym, or anonymously.', send: 'Send my story →' },
+  fr: { title: 'Loopi — Ton monde a des histoires', eyebrow: 'Des histoires qui méritent leur place', heroStart: 'Ton monde a des', heroEnd: 'histoires.', lead: 'Loopi est un coin sûr pour lire, ressentir et partager des histoires. Chaque envoi est examiné avec soin avant d’apparaître.', submit: 'Raconte ton histoire', explore: 'Explorer les histoires', anonymous: '✦ Publie avec ton nom, un pseudonyme ou anonymement.', quote: 'Certaines histoires ne changent pas le monde entier, mais peuvent changer la journée de quelqu’un.', community: 'Une histoire de la communauté', featuredEyebrow: 'Choisies avec soin', featured: 'Histoires à la une', all: 'Tout voir →', themesEyebrow: 'Trouve ton coin', themes: 'Explorer par thème', allThemes: 'Tous les thèmes →', recentEyebrow: 'Tout juste publiées', recent: 'Nouvelles histoires', voiceEyebrow: 'Ta voix compte', voice: 'As-tu une histoire à raconter ?', voiceText: 'Envoie ton texte sans créer de compte. Tu choisis s’il apparaît avec ton nom, un pseudonyme ou anonymement.', send: 'Envoyer mon histoire →' },
+}[lang];
+const stories = (await getCollection('stories', ({ data }) => !data.draft && data.language === lang)).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 const featured = stories.filter(story => story.data.featured).slice(0, 3);
 const recent = stories.slice(0, 4);
 ---
-<BaseLayout lang={lang} title="Loopi — Tu mundo tiene historias" description="Loopi es una comunidad moderada para compartir y leer historias reales.">
+<BaseLayout lang={lang} title={copy.title} description={copy.lead}>
   <section class="hero">
     <div class="hero-fireworks" aria-hidden="true"><span class="hero-firework pink"></span><span class="hero-firework violet"></span><span class="hero-firework gold"></span></div>
     <div>
-      <p class="eyebrow">Historias que merecen un lugar</p>
-      <h1>Tu mundo tiene<br/><em>historias.</em></h1>
-      <p class="lead">Loopi es un rincón seguro para leer, sentir y compartir historias. Cada envío se revisa con cuidado antes de aparecer.</p>
-      <div class="hero-actions"><a class="button" href={`/${lang}/enviar/`}>Cuenta tu historia <span>→</span></a><a class="quiet-link" href="#historias">Explorar historias</a></div>
-      <p class="notice">✦ Puedes publicar con tu nombre, seudónimo o de forma anónima.</p>
+      <p class="eyebrow">{copy.eyebrow}</p>
+      <h1>{copy.heroStart}<br/><em>{copy.heroEnd}</em></h1>
+      <p class="lead">{copy.lead}</p>
+      <div class="hero-actions"><a class="button" href={`/${lang}/enviar/`}>{copy.submit} <span>→</span></a><a class="quiet-link" href="#historias">{copy.explore}</a></div>
+      <p class="notice">{copy.anonymous}</p>
     </div>
     <div class="hero-card" aria-label="Vista previa de una historia">
-      <span class="quote">“</span><p>Hay historias que no cambian el mundo entero, pero sí pueden cambiarle el día a alguien.</p><div><i></i><span>Una historia de la comunidad</span></div>
+      <span class="quote">“</span><p>{copy.quote}</p><div><i></i><span>{copy.community}</span></div>
     </div>
   </section>
 
   <section class="section" id="historias">
-    <div class="section-heading"><div><p class="eyebrow">Elegidas con cariño</p><h2>Historias destacadas</h2></div><a href={`/${lang}/historias/`}>Ver todas →</a></div>
+    <div class="section-heading"><div><p class="eyebrow">{copy.featuredEyebrow}</p><h2>{copy.featured}</h2></div><a href={`/${lang}/historias/`}>{copy.all}</a></div>
     <div class="story-grid featured-grid">
       {featured.map(story => <article class="story-card"><p class="story-meta">{story.data.category} · {formatDate(story.data.date, lang)}</p><h3><a href={`/${story.data.language}/historias/${story.slug}/`}>{story.data.title}</a></h3><p>{story.data.excerpt}</p><footer><span>{story.data.author}</span><a href={`/${story.data.language}/historias/${story.slug}/`} aria-label={`Leer ${story.data.title}`}>→</a></footer></article>)}
     </div>
   </section>
 
   <section class="category-section">
-    <div class="section-heading"><div><p class="eyebrow">Encuentra tu rincón</p><h2>Explora por tema</h2></div><a href={`/${lang}/historias/`}>Todos los temas →</a></div>
+    <div class="section-heading"><div><p class="eyebrow">{copy.themesEyebrow}</p><h2>{copy.themes}</h2></div><a href={`/${lang}/historias/`}>{copy.allThemes}</a></div>
     <div class="categories">{categories.slice(0, 10).map(category => <a href={`/${lang}/historias/#${category.id}`}><span>{category.emoji}</span>{category.label}</a>)}</div>
   </section>
 
   <section class="section recent-section">
-    <div class="section-heading"><div><p class="eyebrow">Recién publicadas</p><h2>Historias nuevas</h2></div></div>
+    <div class="section-heading"><div><p class="eyebrow">{copy.recentEyebrow}</p><h2>{copy.recent}</h2></div></div>
     <div class="recent-list">{recent.map(story => <a href={`/${story.data.language}/historias/${story.slug}/`}><span class="recent-symbol">✦</span><div><b>{story.data.title}</b><p>{story.data.author} · {story.data.category}</p></div><time>{formatDate(story.data.date, lang)}</time></a>)}</div>
   </section>
 
-  <section class="callout"><div><p class="eyebrow">Tu voz importa</p><h2>¿Hay una historia que quieras contar?</h2><p>Envía tu texto sin crear una cuenta. Tú eliges si aparece con tu nombre, seudónimo o de forma anónima.</p></div><a class="button" href={`/${lang}/enviar/`}>Enviar mi historia →</a></section>
+  <section class="callout"><div><p class="eyebrow">{copy.voiceEyebrow}</p><h2>{copy.voice}</h2><p>{copy.voiceText}</p></div><a class="button" href={`/${lang}/enviar/`}>{copy.send}</a></section>
 </BaseLayout>
 <style>
   .hero,.section,.category-section,.callout{max-width:1080px;margin:0 auto;padding-left:24px;padding-right:24px}.hero{min-height:490px;display:grid;grid-template-columns:1.15fr .85fr;gap:70px;align-items:center;padding-top:45px;padding-bottom:55px;background:radial-gradient(circle at 74% 30%,#332756 0,transparent 27%)}.hero h1{font:800 clamp(42px,6.2vw,74px)/.98 'Plus Jakarta Sans';letter-spacing:-.07em;margin:10px 0 20px}.hero h1 em{color:var(--purple);font-style:normal}.lead{max-width:530px;color:var(--muted);font-size:17px}.hero-actions{display:flex;gap:18px;align-items:center;margin-top:27px}.hero-actions span{margin-left:8px}.quiet-link{font-weight:800;font-size:13px}.notice{font-size:12px;color:var(--muted);margin-top:23px}.hero-card{background:var(--surface);border:1px solid var(--line);border-radius:23px;padding:34px;box-shadow:0 18px 42px #00000045;transform:rotate(2deg)}.quote{color:var(--coral);font:800 70px/.6 Georgia}.hero-card>p{font:700 21px/1.4 'Plus Jakarta Sans';letter-spacing:-.04em}.hero-card div{display:flex;align-items:center;gap:9px;color:var(--muted);font-size:11px}.hero-card i{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#f5a4c0,#8c74e9)}.section{padding-top:54px;padding-bottom:20px}.section-heading{display:flex;align-items:end;justify-content:space-between;margin-bottom:21px}.section-heading h2{font:800 29px 'Plus Jakarta Sans';letter-spacing:-.06em;margin:3px 0 0}.section-heading>a{color:var(--purple);font-size:12px;font-weight:800}.story-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.story-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:21px;display:flex;flex-direction:column;min-height:220px}.story-meta{color:var(--purple);font-size:10px;font-weight:800;text-transform:capitalize;margin:0}.story-card h3{font:800 19px/1.2 'Plus Jakarta Sans';letter-spacing:-.04em;margin:11px 0 9px}.story-card>p:not(.story-meta){color:var(--muted);font-size:13px;margin:0}.story-card footer{border:0;margin-top:auto;padding:19px 0 0;display:flex;justify-content:space-between;color:var(--muted);font-size:11px}.story-card footer a{color:var(--purple);font-size:18px}.category-section{padding-top:55px;padding-bottom:35px}.categories{display:grid;grid-template-columns:repeat(5,1fr);gap:9px}.categories a{background:var(--lilac);color:#51447d;border-radius:10px;padding:12px 9px;font-size:11px;font-weight:700}.categories span{margin-right:7px;font-size:15px}.recent-section{padding-bottom:56px}.recent-list{background:var(--surface);border:1px solid var(--line);border-radius:16px}.recent-list>a{display:flex;align-items:center;gap:13px;padding:15px 18px;border-bottom:1px solid var(--line)}.recent-list>a:last-child{border:0}.recent-symbol{color:var(--purple)}.recent-list b{font-size:13px}.recent-list p{margin:2px 0 0;color:var(--muted);font-size:11px;text-transform:capitalize}.recent-list time{margin-left:auto;color:var(--muted);font-size:10px}.callout{margin-bottom:16px;background:linear-gradient(115deg,#4e34a6,#7d5de3);color:#fff;border-radius:22px;padding:36px 42px;display:flex;align-items:center;justify-content:space-between;gap:25px}.callout .eyebrow{color:#dfd2ff}.callout h2{font:800 29px 'Plus Jakarta Sans';letter-spacing:-.05em;margin:4px 0}.callout p:not(.eyebrow){font-size:13px;max-width:630px;color:#eeeaff}.callout .button{background:var(--surface);color:#5136a9;white-space:nowrap}@media(max-width:760px){.hero{display:block;min-height:auto;padding-top:55px}.hero-card{margin:45px 18px 0}.story-grid{grid-template-columns:1fr}.categories{grid-template-columns:repeat(2,1fr)}.callout{display:block;padding:30px}.callout .button{margin-top:10px}.recent-list time{display:none}}

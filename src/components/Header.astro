@@ -2,21 +2,26 @@
 import { languages, languageNames, type Lang } from '../lib/i18n';
 import { translationLanguages } from '../lib/loopi';
 const { lang } = Astro.props as { lang: Lang };
+const labels = {
+  es: { home: 'Inicio', stories: 'Historias', submit: 'Enviar historia', rules: 'Normas', navigation: 'Navegación principal', interface: 'Idioma de la interfaz', translate: 'Traducir' },
+  en: { home: 'Home', stories: 'Stories', submit: 'Submit a story', rules: 'Rules', navigation: 'Main navigation', interface: 'Interface language', translate: 'Translate' },
+  fr: { home: 'Accueil', stories: 'Histoires', submit: 'Envoyer une histoire', rules: 'Règles', navigation: 'Navigation principale', interface: "Langue de l’interface", translate: 'Traduire' },
+}[lang];
 ---
 <header class="site-header">
-  <a class="brand" href={`/${lang}/`} aria-label="Loopi inicio"><span class="loop">∞</span>loopi</a>
-  <nav aria-label="Navegación principal">
-    <a href={`/${lang}/`}>Inicio</a>
-    <a href={`/${lang}/historias/`}>Historias</a>
-    <a href={`/${lang}/enviar/`}>Enviar historia</a>
-    <a href={`/${lang}/normas/`}>Normas</a>
+  <a class="brand" href={`/${lang}/`} aria-label="Loopi"><span class="loop">∞</span>loopi</a>
+  <nav aria-label={labels.navigation}>
+    <a href={`/${lang}/`}>{labels.home}</a>
+    <a href={`/${lang}/historias/`}>{labels.stories}</a>
+    <a href={`/${lang}/enviar/`}>{labels.submit}</a>
+    <a href={`/${lang}/normas/`}>{labels.rules}</a>
   </nav>
   <div class="language-tools">
-    <select id="interfaceLanguage" aria-label="Idioma de la interfaz">
+    <select id="interfaceLanguage" aria-label={labels.interface}>
       {languages.map((item) => <option value={item} selected={item === lang}>{languageNames[item]}</option>)}
     </select>
     <select id="translationLanguage" aria-label="Traducir esta página">
-      <option value="">Traducir</option>
+      <option value="">{labels.translate}</option>
       {translationLanguages.map(([code, name]) => <option value={code}>{name}</option>)}
     </select>
   </div>
