@@ -4,8 +4,64 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Loopi · Administración</title>
+    <style>
+      :root{color-scheme:dark;--ink:#f4f0ff;--muted:#b9b0ca;--paper:#120f1f;--surface:#201a31;--line:#373048;--purple:#a992ff;--coral:#ff917f}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px system-ui,sans-serif;line-height:1.5}.wrap{max-width:760px;margin:0 auto;padding:48px 20px}.brand{color:var(--purple);font-weight:800;letter-spacing:.08em;text-transform:uppercase;font-size:12px}h1{font-size:clamp(30px,5vw,44px);line-height:1.05;margin:8px 0 12px}p{color:var(--muted)}.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:24px;margin-top:28px}label{display:block;font-size:13px;font-weight:700;margin:17px 0 7px}input,textarea,select{width:100%;border:1px solid var(--line);background:#171224;color:var(--ink);border-radius:9px;padding:11px;font:inherit}textarea{min-height:220px;resize:vertical}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.check{display:flex;gap:9px;align-items:center;margin-top:17px;font-size:13px}.check input{width:auto}button{border:0;border-radius:10px;background:var(--purple);color:#171224;padding:12px 17px;font-weight:800;font:inherit;margin-top:22px;cursor:pointer}button:disabled{opacity:.6}.hint{font-size:12px}.status{min-height:24px;font-weight:700}.status.error{color:var(--coral)}.hidden{display:none}@media(max-width:560px){.grid{grid-template-columns:1fr}.wrap{padding-top:30px}}
+    </style>
   </head>
   <body>
-    <script src="https://unpkg.com/decap-cms@3.7.0/dist/decap-cms.js"></script>
+    <main class="wrap">
+      <div class="brand">∞ Loopi · Administración privada</div>
+      <h1>Publicar una historia</h1>
+      <p>Este panel publica historias aprobadas directamente en Loopi.</p>
+
+      <section class="card" id="login-card">
+        <label for="password">Contraseña de administración</label>
+        <input id="password" type="password" autocomplete="current-password" />
+        <button id="enter" type="button">Entrar</button>
+        <p class="hint">No compartas esta contraseña.</p>
+      </section>
+
+      <form class="card hidden" id="story-form">
+        <div class="grid"><div><label for="title">Título</label><input id="title" name="title" required /></div><div><label for="author">Nombre o seudónimo</label><input id="author" name="author" placeholder="Anónimo" /></div></div>
+        <label for="excerpt">Resumen corto</label><textarea id="excerpt" name="excerpt" required rows="3" placeholder="Una o dos frases para mostrar en la portada."></textarea>
+        <div class="grid"><div><label for="category">Tema</label><select id="category" name="category" required><option value="amistad">Amistad</option><option value="familia">Familia</option><option value="romance">Romance</option><option value="triste / emocional">Triste / emocional</option><option value="graciosa">Graciosa</option><option value="escuela o trabajo">Escuela o trabajo</option><option value="viajes">Viajes</option><option value="confesión">Confesión</option><option value="superacion">Superación</option><option value="misterio">Misterio</option></select></div><div><label for="tags">Etiquetas</label><input id="tags" name="tags" placeholder="Ej.: apoyo, recuerdos" /></div></div>
+        <label for="body">Historia completa</label><textarea id="body" name="body" required placeholder="Pega aquí la historia aprobada."></textarea>
+        <label class="check"><input id="featured" type="checkbox" /> Destacar en la portada</label>
+        <button id="publish" type="submit">Publicar historia</button>
+        <p class="status" id="status" aria-live="polite"></p>
+      </form>
+    </main>
+    <script>
+      const password = document.querySelector('#password');
+      const loginCard = document.querySelector('#login-card');
+      const form = document.querySelector('#story-form');
+      let adminPassword = '';
+      document.querySelector('#enter').addEventListener('click', () => {
+        if (!password.value) return;
+        adminPassword = password.value;
+        loginCard.classList.add('hidden');
+        form.classList.remove('hidden');
+      });
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const button = document.querySelector('#publish');
+        const status = document.querySelector('#status');
+        button.disabled = true;
+        status.className = 'status';
+        status.textContent = 'Publicando…';
+        const payload = Object.fromEntries(new FormData(form));
+        payload.featured = document.querySelector('#featured').checked;
+        try {
+          const response = await fetch('/.netlify/functions/publish-story', {method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${adminPassword}`},body:JSON.stringify(payload)});
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.message || 'No se pudo publicar.');
+          status.textContent = '¡Publicada! Loopi se actualizará en unos momentos.';
+          form.reset();
+        } catch (error) {
+          status.className = 'status error';
+          status.textContent = error.message;
+        } finally { button.disabled = false; }
+      });
+    </script>
   </body>
 </html>
