@@ -2,16 +2,16 @@
 import type { Lang } from '../lib/i18n';
 const { lang } = Astro.props as { lang: Lang };
 const copy = {
-  es: { note: 'Historias compartidas con cuidado.', rules: 'Normas', privacy: 'Privacidad', submit: 'Enviar una historia' },
-  en: { note: 'Stories shared with care.', rules: 'Rules', privacy: 'Privacy', submit: 'Submit a story' },
-  fr: { note: 'Des histoires partagées avec soin.', rules: 'Règles', privacy: 'Confidentialité', submit: 'Envoyer une histoire' },
-  pt: { note: 'Histórias partilhadas com cuidado.', rules: 'Regras', privacy: 'Privacidade', submit: 'Enviar uma história' },
-  it: { note: 'Storie condivise con cura.', rules: 'Regole', privacy: 'Privacy', submit: 'Invia una storia' },
-  de: { note: 'Geschichten, die mit Sorgfalt geteilt werden.', rules: 'Regeln', privacy: 'Datenschutz', submit: 'Eine Geschichte senden' },
+  es: { note: 'Historias compartidas con cuidado.', rules: 'Normas', privacy: 'Privacidad', submit: 'Enviar una historia', admin: 'Administración' },
+  en: { note: 'Stories shared with care.', rules: 'Rules', privacy: 'Privacy', submit: 'Submit a story', admin: 'Administration' },
+  fr: { note: 'Des histoires partagées avec soin.', rules: 'Règles', privacy: 'Confidentialité', submit: 'Envoyer une histoire', admin: 'Administration' },
+  pt: { note: 'Histórias partilhadas com cuidado.', rules: 'Regras', privacy: 'Privacidade', submit: 'Enviar uma história', admin: 'Administração' },
+  it: { note: 'Storie condivise con cura.', rules: 'Regole', privacy: 'Privacy', submit: 'Invia una storia', admin: 'Amministrazione' },
+  de: { note: 'Geschichten, die mit Sorgfalt geteilt werden.', rules: 'Regeln', privacy: 'Datenschutz', submit: 'Eine Geschichte senden', admin: 'Verwaltung' },
 }[lang];
 ---
 <footer>
   <p>© {new Date().getFullYear()} Loopi · {copy.note}</p>
-  <div><a href={`/${lang}/normas/`}>{copy.rules}</a><a href={`/${lang}/privacidad/`}>{copy.privacy}</a><a href={`/${lang}/enviar/`}>{copy.submit}</a></div>
+  <div><a href={`/${lang}/normas/`}>{copy.rules}</a><a href={`/${lang}/privacidad/`}>{copy.privacy}</a><a href={`/${lang}/enviar/`}>{copy.submit}</a><a href="/admin/">{copy.admin}</a></div>
 </footer>
 <style>footer{max-width:1180px;margin:36px auto 0;padding:25px 20px;color:var(--muted);font-size:12px;display:flex;justify-content:space-between;border-top:1px solid var(--line)}footer p{margin:0}footer div{display:flex;gap:18px}@media(max-width:600px){footer{display:block}footer div{margin-top:10px}}</style>
