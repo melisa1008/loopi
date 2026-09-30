@@ -30,5 +30,8 @@
       </section>
     </main>
     <style>.publish-link{display:inline-block;background:var(--purple);color:#171224;border-radius:10px;padding:12px 17px;font-weight:800;margin-top:12px}.publish-link.danger{background:var(--coral)}</style>
+    <script>
+      if ('serviceWorker' in navigator) navigator.serviceWorker.register('/admin/sw.js');
+    </script>
   </body>
 </html>
