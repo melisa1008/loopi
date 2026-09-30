@@ -1,0 +1,12 @@
+{
+  "id": "/admin/",
+  "name": "Loopi Admin",
+  "short_name": "Loopi Admin",
+  "start_url": "/admin/",
+  "display": "standalone",
+  "background_color": "#120f1f",
+  "theme_color": "#120f1f",
+  "icons": [
+    { "src": "/loopi-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
