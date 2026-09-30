@@ -3,12 +3,12 @@ import { languages, languageNames, type Lang } from '../lib/i18n';
 import { translationLanguages } from '../lib/loopi';
 const { lang } = Astro.props as { lang: Lang };
 const labels = {
-  es: { home: 'Inicio', stories: 'Historias', submit: 'Enviar historia', rules: 'Normas', navigation: 'Navegación principal', interface: 'Idioma de la interfaz', translate: 'Traducir', translationAria: 'Traducir esta página' },
-  en: { home: 'Home', stories: 'Stories', submit: 'Submit a story', rules: 'Rules', navigation: 'Main navigation', interface: 'Interface language', translate: 'Translate', translationAria: 'Translate this page' },
-  fr: { home: 'Accueil', stories: 'Histoires', submit: 'Envoyer une histoire', rules: 'Règles', navigation: 'Navigation principale', interface: "Langue de l’interface", translate: 'Traduire', translationAria: 'Traduire cette page' },
-  pt: { home: 'Início', stories: 'Histórias', submit: 'Enviar história', rules: 'Regras', navigation: 'Navegação principal', interface: 'Idioma da interface', translate: 'Traduzir', translationAria: 'Traduzir esta página' },
-  it: { home: 'Home', stories: 'Storie', submit: 'Invia una storia', rules: 'Regole', navigation: 'Navigazione principale', interface: 'Lingua dell’interfaccia', translate: 'Traduci', translationAria: 'Traduci questa pagina' },
-  de: { home: 'Startseite', stories: 'Geschichten', submit: 'Geschichte senden', rules: 'Regeln', navigation: 'Hauptnavigation', interface: 'Sprache der Benutzeroberfläche', translate: 'Übersetzen', translationAria: 'Diese Seite übersetzen' },
+  es: { home: 'Inicio', stories: 'Historias', submit: 'Enviar historia', rules: 'Normas', admin: 'Administración', navigation: 'Navegación principal', interface: 'Idioma de la interfaz', translate: 'Traducir', translationAria: 'Traducir esta página' },
+  en: { home: 'Home', stories: 'Stories', submit: 'Submit a story', rules: 'Rules', admin: 'Administration', navigation: 'Main navigation', interface: 'Interface language', translate: 'Translate', translationAria: 'Translate this page' },
+  fr: { home: 'Accueil', stories: 'Histoires', submit: 'Envoyer une histoire', rules: 'Règles', admin: 'Administration', navigation: 'Navigation principale', interface: "Langue de l’interface", translate: 'Traduire', translationAria: 'Traduire cette page' },
+  pt: { home: 'Início', stories: 'Histórias', submit: 'Enviar história', rules: 'Regras', admin: 'Administração', navigation: 'Navegação principal', interface: 'Idioma da interface', translate: 'Traduzir', translationAria: 'Traduzir esta página' },
+  it: { home: 'Home', stories: 'Storie', submit: 'Invia una storia', rules: 'Regole', admin: 'Amministrazione', navigation: 'Navigazione principale', interface: 'Lingua dell’interfaccia', translate: 'Traduci', translationAria: 'Traduci questa pagina' },
+  de: { home: 'Startseite', stories: 'Geschichten', submit: 'Geschichte senden', rules: 'Regeln', admin: 'Verwaltung', navigation: 'Hauptnavigation', interface: 'Sprache der Benutzeroberfläche', translate: 'Übersetzen', translationAria: 'Diese Seite übersetzen' },
 }[lang];
 ---
 <header class="site-header">
@@ -18,6 +18,7 @@ const labels = {
     <a href={`/${lang}/historias/`}>{labels.stories}</a>
     <a href={`/${lang}/enviar/`}>{labels.submit}</a>
     <a href={`/${lang}/normas/`}>{labels.rules}</a>
+    <a id="admin-link" href="/admin/" hidden>{labels.admin}</a>
   </nav>
   <div class="language-tools">
     <select id="interfaceLanguage" aria-label={labels.interface}>
@@ -30,6 +31,7 @@ const labels = {
   </div>
 </header>
 <script>
+  import { supabase } from '../lib/supabase';
   const interfaceLanguage = document.querySelector<HTMLSelectElement>('#interfaceLanguage');
   interfaceLanguage?.addEventListener('change', () => {
     const next = interfaceLanguage.value;
@@ -43,6 +45,16 @@ const labels = {
     if (!translationLanguage.value) return;
     window.location.href = `https://translate.google.com/translate?sl=auto&tl=${translationLanguage.value}&u=${encodeURIComponent(window.location.href)}`;
   });
+  const adminLink = document.querySelector<HTMLAnchorElement>('#admin-link');
+  async function revealAdminLink() {
+    if (!supabase || !adminLink) return;
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { data } = await supabase.from('admins').select('user_id').eq('user_id', user.id).maybeSingle();
+    adminLink.hidden = !data;
+  }
+  revealAdminLink();
+  supabase?.auth.onAuthStateChange(() => revealAdminLink());
 </script>
 <style>
   .site-header{min-height:68px;background:rgba(18,15,31,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:0 max(28px,calc((100vw - 1180px)/2));display:flex;align-items:center;gap:28px;position:sticky;top:0;z-index:10}
