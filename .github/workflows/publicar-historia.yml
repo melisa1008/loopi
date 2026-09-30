@@ -1,0 +1,36 @@
+name: Publicar historia en Loopi
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  publish:
+    if: github.event.issue.author_association == 'OWNER' && contains(github.event.issue.labels.*.name, 'publicar historia')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.issue.body || '';
+            const field = (name) => {
+              const match = body.match(new RegExp(`### ${name}\\s*\\n\\s*([\\s\\S]*?)(?=\\n### |$)`));
+              return match?.[1]?.trim() || '';
+            };
+            const title = field('Título');
+            const author = field('Nombre o seudónimo') || 'Anónimo';
+            const excerpt = field('Resumen corto');
+            const category = field('Tema');
+            const tags = field('Etiquetas').split(',').map(tag => tag.trim()).filter(Boolean);
+            const story = field('Historia completa');
+            const slug = title.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+            if (!title || !excerpt || !category || !story || !slug) core.setFailed('Faltan datos obligatorios.');
+            const date = new Date().toISOString().slice(0, 10);
+            const content = ['---', `title: ${JSON.stringify(title)}`, `excerpt: ${JSON.stringify(excerpt)}`, `date: ${date}`, `author: ${JSON.stringify(author)}`, `category: ${JSON.stringify(category)}`, `tags: [${tags.map(tag => JSON.stringify(tag)).join(', ')}]`, 'featured: false', 'language: es', 'draft: false', '---', '', story, ''].join('\n');
+            await github.rest.repos.createOrUpdateFileContents({ owner: context.repo.owner, repo: context.repo.repo, path: `src/content/stories/es/${slug}.md`, message: `Publicar historia: ${title}`, content: Buffer.from(content).toString('base64'), branch: 'main' });
+            await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body: '✅ Historia publicada. Loopi se actualizará automáticamente en unos minutos.' });
+            await github.rest.issues.update({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, state: 'closed' });

@@ -1,0 +1,32 @@
+name: Publicar una historia
+description: Añade una historia aprobada a Loopi
+title: "Historia: "
+labels: ["publicar historia"]
+body:
+  - type: markdown
+    attributes:
+      value: "Completa los datos de una historia que ya hayas revisado y aprobado."
+  - type: input
+    id: title
+    attributes: { label: Título }
+    validations: { required: true }
+  - type: input
+    id: author
+    attributes: { label: Nombre o seudónimo, placeholder: "Anónimo" }
+  - type: textarea
+    id: excerpt
+    attributes: { label: Resumen corto, description: "Una o dos frases para la portada." }
+    validations: { required: true }
+  - type: dropdown
+    id: category
+    attributes:
+      label: Tema
+      options: [amistad, familia, romance, "triste / emocional", graciosa, "escuela o trabajo", viajes, confesión, superacion, misterio]
+    validations: { required: true }
+  - type: input
+    id: tags
+    attributes: { label: Etiquetas, placeholder: "Ej.: apoyo, recuerdos" }
+  - type: textarea
+    id: body
+    attributes: { label: Historia completa }
+    validations: { required: true }
