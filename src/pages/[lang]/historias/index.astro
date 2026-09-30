@@ -2,14 +2,23 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { isLang, languages, formatDate } from '../../../lib/i18n';
-import { categories } from '../../../lib/loopi';
+import { categoriesForLanguage } from '../../../lib/loopi';
 export function getStaticPaths() { return languages.map(lang => ({ params: { lang } })); }
 const { lang } = Astro.params;
 if (!isLang(lang)) return Astro.redirect('/es/');
 const stories = (await getCollection('stories', ({ data }) => !data.draft && data.language === lang)).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const categories = categoriesForLanguage(lang);
+const copy = {
+  es: { title: 'Historias — Loopi', eyebrow: 'Todas las voces', heading: 'Historias de la comunidad', intro: 'Cada texto ha sido revisado antes de publicarse. Elige un tema o descubre algo inesperado.' },
+  en: { title: 'Stories — Loopi', eyebrow: 'Every voice', heading: 'Community stories', intro: 'Every text has been reviewed before publication. Choose a theme or discover something unexpected.' },
+  fr: { title: 'Histoires — Loopi', eyebrow: 'Toutes les voix', heading: 'Histoires de la communauté', intro: 'Chaque texte a été examiné avant sa publication. Choisis un thème ou découvre quelque chose d’inattendu.' },
+  pt: { title: 'Histórias — Loopi', eyebrow: 'Todas as vozes', heading: 'Histórias da comunidade', intro: 'Cada texto foi revisto antes de ser publicado. Escolhe um tema ou descobre algo inesperado.' },
+  it: { title: 'Storie — Loopi', eyebrow: 'Tutte le voci', heading: 'Storie della comunità', intro: 'Ogni testo è stato revisionato prima della pubblicazione. Scegli un tema o scopri qualcosa di inaspettato.' },
+  de: { title: 'Geschichten — Loopi', eyebrow: 'Alle Stimmen', heading: 'Geschichten der Gemeinschaft', intro: 'Jeder Text wurde vor der Veröffentlichung geprüft. Wähle ein Thema oder entdecke etwas Unerwartetes.' },
+}[lang];
 ---
-<BaseLayout lang={lang} title="Historias — Loopi">
-  <section class="page-wrap"><p class="eyebrow">Todas las voces</p><h1>Historias de la comunidad</h1><p class="intro">Cada texto ha sido revisado antes de publicarse. Elige un tema o descubre algo inesperado.</p>
+<BaseLayout lang={lang} title={copy.title} description={copy.intro}>
+  <section class="page-wrap"><p class="eyebrow">{copy.eyebrow}</p><h1>{copy.heading}</h1><p class="intro">{copy.intro}</p>
   <div class="filters">{categories.map(category => <a id={category.id} href={`#${category.id}`}>{category.emoji} {category.label}</a>)}</div>
   <div class="stories">{stories.map(story => <article><p class="meta">{story.data.category} · {formatDate(story.data.date, lang)}</p><h2><a href={`/${story.data.language}/historias/${story.slug}/`}>{story.data.title}</a></h2><p>{story.data.excerpt}</p><footer><span>{story.data.author}</span><span>{story.data.tags.map(tag => `#${tag}`).join(' ')}</span></footer></article>)}</div></section>
 </BaseLayout>

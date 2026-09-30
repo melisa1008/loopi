@@ -1,7 +1,7 @@
 ---
 ---
 <script>
-  const available = ['es', 'en', 'fr'];
+  const available = ['es', 'en', 'fr', 'pt', 'it', 'de'];
   const preferred = navigator.language.split('-')[0];
   window.location.replace(`/${available.includes(preferred) ? preferred : 'es'}/`);
 </script>

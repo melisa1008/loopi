@@ -3,9 +3,12 @@ import { languages, languageNames, type Lang } from '../lib/i18n';
 import { translationLanguages } from '../lib/loopi';
 const { lang } = Astro.props as { lang: Lang };
 const labels = {
-  es: { home: 'Inicio', stories: 'Historias', submit: 'Enviar historia', rules: 'Normas', navigation: 'Navegación principal', interface: 'Idioma de la interfaz', translate: 'Traducir' },
-  en: { home: 'Home', stories: 'Stories', submit: 'Submit a story', rules: 'Rules', navigation: 'Main navigation', interface: 'Interface language', translate: 'Translate' },
-  fr: { home: 'Accueil', stories: 'Histoires', submit: 'Envoyer une histoire', rules: 'Règles', navigation: 'Navigation principale', interface: "Langue de l’interface", translate: 'Traduire' },
+  es: { home: 'Inicio', stories: 'Historias', submit: 'Enviar historia', rules: 'Normas', navigation: 'Navegación principal', interface: 'Idioma de la interfaz', translate: 'Traducir', translationAria: 'Traducir esta página' },
+  en: { home: 'Home', stories: 'Stories', submit: 'Submit a story', rules: 'Rules', navigation: 'Main navigation', interface: 'Interface language', translate: 'Translate', translationAria: 'Translate this page' },
+  fr: { home: 'Accueil', stories: 'Histoires', submit: 'Envoyer une histoire', rules: 'Règles', navigation: 'Navigation principale', interface: "Langue de l’interface", translate: 'Traduire', translationAria: 'Traduire cette page' },
+  pt: { home: 'Início', stories: 'Histórias', submit: 'Enviar história', rules: 'Regras', navigation: 'Navegação principal', interface: 'Idioma da interface', translate: 'Traduzir', translationAria: 'Traduzir esta página' },
+  it: { home: 'Home', stories: 'Storie', submit: 'Invia una storia', rules: 'Regole', navigation: 'Navigazione principale', interface: 'Lingua dell’interfaccia', translate: 'Traduci', translationAria: 'Traduci questa pagina' },
+  de: { home: 'Startseite', stories: 'Geschichten', submit: 'Geschichte senden', rules: 'Regeln', navigation: 'Hauptnavigation', interface: 'Sprache der Benutzeroberfläche', translate: 'Übersetzen', translationAria: 'Diese Seite übersetzen' },
 }[lang];
 ---
 <header class="site-header">
@@ -20,7 +23,7 @@ const labels = {
     <select id="interfaceLanguage" aria-label={labels.interface}>
       {languages.map((item) => <option value={item} selected={item === lang}>{languageNames[item]}</option>)}
     </select>
-    <select id="translationLanguage" aria-label="Traducir esta página">
+    <select id="translationLanguage" aria-label={labels.translationAria}>
       <option value="">{labels.translate}</option>
       {translationLanguages.map(([code, name]) => <option value={code}>{name}</option>)}
     </select>
@@ -31,7 +34,7 @@ const labels = {
   interfaceLanguage?.addEventListener('change', () => {
     const next = interfaceLanguage.value;
     const parts = window.location.pathname.split('/');
-    if (['es', 'en', 'fr'].includes(parts[1])) parts[1] = next;
+    if (['es', 'en', 'fr', 'pt', 'it', 'de'].includes(parts[1])) parts[1] = next;
     else parts.splice(1, 0, next);
     window.location.href = `${parts.join('/')}${window.location.search}${window.location.hash}`;
   });

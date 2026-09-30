@@ -1,10 +1,13 @@
-export const languages = ['es', 'en', 'fr'] as const;
+export const languages = ['es', 'en', 'fr', 'pt', 'it', 'de'] as const;
 export type Lang = (typeof languages)[number];
 
 export const languageNames: Record<Lang, string> = {
   es: 'Español',
   en: 'English',
   fr: 'Français',
+  pt: 'Português',
+  it: 'Italiano',
+  de: 'Deutsch',
 };
 
 export function isLang(value: string | undefined): value is Lang {
