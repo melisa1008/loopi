@@ -2,7 +2,7 @@ import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
-  site: 'https://loopi.pages.dev',
+  site: 'https://melisa1008.github.io',
   integrations: [sitemap()],
   i18n: {
     defaultLocale: 'es',
