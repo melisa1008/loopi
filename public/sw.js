@@ -1,4 +1,4 @@
-const CACHE_NAME = 'loopi-v2';
+const CACHE_NAME = 'loopi-v3';
 const APP_SHELL = ['/es/', '/es/historias/', '/es/enviar/', '/manifest.webmanifest', '/loopi-icon.svg'];
 
 self.addEventListener('install', (event) => {
