@@ -1,0 +1,21 @@
+name: Eliminar una historia
+description: Quita una historia publicada de Loopi
+title: "Eliminar historia: "
+labels: ["eliminar historia"]
+body:
+  - type: markdown
+    attributes:
+      value: "Esta acción quitará la historia de la web. Solo la dueña de Loopi puede enviarla."
+  - type: input
+    id: link
+    attributes:
+      label: Enlace de la historia
+      description: "Copia la dirección completa de la historia que quieres eliminar."
+      placeholder: "https://melisa1008.github.io/es/historias/mi-historia/"
+    validations: { required: true }
+  - type: dropdown
+    id: confirmation
+    attributes:
+      label: Confirmación
+      options: ["Sí, quiero eliminar esta historia"]
+    validations: { required: true }
