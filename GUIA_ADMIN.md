@@ -1,5 +1,11 @@
 # Guía de Loopi
 
+## Palabra clave para retomar
+
+**LOOPI-RETOMAR-2026**
+
+Cuando vuelvas, escribe esta palabra clave y revisaremos esta guía para continuar desde el estado actual.
+
 ## Enlaces importantes
 
 - Web pública: https://melisa1008.github.io/
