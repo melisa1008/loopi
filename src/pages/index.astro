@@ -1,0 +1,8 @@
+---
+---
+<script>
+  const available = ['es', 'en', 'fr'];
+  const preferred = navigator.language.split('-')[0];
+  window.location.replace(`/${available.includes(preferred) ? preferred : 'es'}/`);
+</script>
+<a href="/es/">Continuar</a>

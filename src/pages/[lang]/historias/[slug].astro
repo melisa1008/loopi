@@ -1,0 +1,26 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { localeFromId, slugFromId, formatDate, type Lang } from '../../../lib/i18n';
+import { commentFormUrl } from '../../../lib/loopi';
+export async function getStaticPaths() {
+  const stories = await getCollection('stories', ({ data }) => !data.draft);
+  return stories.map(story => ({ params: { lang: localeFromId(story.id), slug: slugFromId(story.id) }, props: { story } }));
+}
+const { story } = Astro.props;
+const lang = Astro.params.lang as Lang;
+const { Content } = await render(story);
+const commentUrl = commentFormUrl ? `${commentFormUrl}${commentFormUrl.includes('?') ? '&' : '?'}story=${encodeURIComponent(story.slug)}` : '';
+---
+<BaseLayout lang={lang} title={`${story.data.title} — Loopi`} description={story.data.excerpt}>
+  <article class="story page-wrap">
+    <a class="back" href={`/${lang}/historias/`}>← Todas las historias</a>
+    <header><p class="eyebrow">{story.data.category} · {formatDate(story.data.date, lang)}</p><h1>{story.data.title}</h1><div class="byline"><span class="avatar">{story.data.author.charAt(0)}</span><div><b>{story.data.author}</b><small>Historia publicada en Loopi</small></div></div></header>
+    <div class="prose"><Content /></div>
+    <div class="tags">{story.data.tags.map(tag => <span>#{tag}</span>)}</div>
+    <section class="comments" id="comentarios"><p class="eyebrow">Conversación</p><h2>Comentarios</h2><p>Los comentarios y las respuestas se revisan antes de aparecer para cuidar este espacio.</p>
+      {commentUrl ? <a class="button" href={commentUrl} target="_blank" rel="noopener">Dejar un comentario →</a> : <div class="form-pending"><b>Comentarios próximamente</b><span>El formulario de comentarios se activará cuando Loopi conecte su buzón de moderación.</span></div>}
+    </section>
+  </article>
+</BaseLayout>
+<style>.story{max-width:800px}.back{display:inline-block;color:var(--purple);font-size:12px;font-weight:800;margin-bottom:33px}.story header{border-bottom:1px solid var(--line);padding-bottom:28px}.story h1{font:800 clamp(36px,6vw,58px)/1.04 'Plus Jakarta Sans';letter-spacing:-.07em;margin:8px 0 25px}.byline{display:flex;align-items:center;gap:10px;font-size:12px}.avatar{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;color:#fff;font-weight:800;background:linear-gradient(135deg,#fa9b93,#876ce7)}.byline small{display:block;color:var(--muted)}.prose{font-size:17px;line-height:1.8;max-width:680px;padding:36px 0}.prose :global(p){margin:0 0 22px}.tags{display:flex;gap:8px;flex-wrap:wrap;padding-bottom:36px}.tags span{background:var(--lilac);border-radius:20px;padding:6px 10px;font-size:11px;color:var(--ink)}.comments{border-top:1px solid var(--line);padding:34px 0}.comments h2{font:800 27px 'Plus Jakarta Sans';letter-spacing:-.06em;margin:3px 0}.comments>p:not(.eyebrow){color:var(--muted);max-width:570px;font-size:13px;margin:8px 0 17px}.form-pending{background:var(--lilac);border-radius:12px;padding:16px;font-size:12px;color:var(--muted)}.form-pending span{display:block;margin-top:2px}</style>

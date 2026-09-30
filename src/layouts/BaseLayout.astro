@@ -1,0 +1,38 @@
+---
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import type { Lang } from '../lib/i18n';
+const { lang, title = 'Loopi — Comparte tu mundo', description = 'Una comunidad para compartir historias y conectar' } = Astro.props as { lang: Lang; title?: string; description?: string };
+---
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#7655ed" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Loopi" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/loopi-icon.svg" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <Header lang={lang} />
+    <main><slot /></main>
+    <Footer lang={lang} />
+  </body>
+</html>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+  }
+</script>
+<style is:global>
+   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap');
+    :root { --ink:#f4f0ff; --muted:#b9b0ca; --paper:#120f1f; --surface:#201a31; --line:#373048; --purple:#a992ff; --purple-dark:#866cf4; --lilac:#2b2442; --coral:#ff917f; }
+    * { box-sizing:border-box; } html { scroll-behavior:smooth; } body { margin:0; background:var(--paper); color:var(--ink); font-family:'DM Sans',sans-serif; font-size:14px; line-height:1.55; } main,body>footer{position:relative;z-index:1}
+    button,input,textarea,select { font:inherit; } button { cursor:pointer; } a { color:inherit; text-decoration:none; } main { min-height:74vh; } .page-wrap{max-width:1080px;margin:0 auto;padding:52px 24px}.eyebrow{color:var(--purple);font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}.button{display:inline-flex;align-items:center;justify-content:center;background:var(--purple);color:#fff;border-radius:10px;padding:12px 17px;font-size:13px;font-weight:800}.button:hover{background:var(--purple-dark)}
+   @media(max-width:700px) { body { font-size:13px; } }
+</style>

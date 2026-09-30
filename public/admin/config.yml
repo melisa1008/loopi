@@ -1,0 +1,34 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: public/uploads
+public_folder: /uploads
+
+locale: es
+slug:
+  encoding: ascii
+  clean_accents: true
+
+collections:
+  - name: stories
+    label: Historias
+    label_singular: Historia
+    folder: src/content/stories/es
+    create: true
+    slug: "{{slug}}"
+    summary: "{{title}} — {{author}}"
+    fields:
+      - { label: Título, name: title, widget: string }
+      - { label: Resumen corto, name: excerpt, widget: text, hint: "Una o dos frases para mostrar en la portada." }
+      - { label: Fecha, name: date, widget: datetime, format: "YYYY-MM-DD", date_format: "DD/MM/YYYY", time_format: false }
+      - { label: Nombre o seudónimo, name: author, widget: string, default: "Anónimo", required: false }
+      - label: Tema
+        name: category
+        widget: select
+        options: ["amistad", "familia", "romance", "triste / emocional", "graciosa", "escuela o trabajo", "viajes", "confesión", "superacion", "misterio"]
+      - { label: Etiquetas, name: tags, widget: list, required: false }
+      - { label: Destacar en portada, name: featured, widget: boolean, default: false, required: false }
+      - { label: Publicar ahora, name: draft, widget: boolean, default: false, required: false, hint: "Déjalo desmarcado para que la historia sea visible." }
+      - { label: Idioma, name: language, widget: hidden, default: es }
+      - { label: Historia completa, name: body, widget: markdown }

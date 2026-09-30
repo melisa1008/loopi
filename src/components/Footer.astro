@@ -1,0 +1,9 @@
+---
+import type { Lang } from '../lib/i18n';
+const { lang } = Astro.props as { lang: Lang };
+---
+<footer>
+  <p>© {new Date().getFullYear()} Loopi · Historias compartidas con cuidado.</p>
+  <div><a href={`/${lang}/normas/`}>Normas</a><a href={`/${lang}/privacidad/`}>Privacidad</a><a href={`/${lang}/enviar/`}>Enviar una historia</a></div>
+</footer>
+<style>footer{max-width:1180px;margin:36px auto 0;padding:25px 20px;color:var(--muted);font-size:12px;display:flex;justify-content:space-between;border-top:1px solid var(--line)}footer p{margin:0}footer div{display:flex;gap:18px}@media(max-width:600px){footer{display:block}footer div{margin-top:10px}}</style>

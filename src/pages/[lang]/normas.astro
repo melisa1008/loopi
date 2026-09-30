@@ -1,0 +1,9 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { isLang, languages } from '../../lib/i18n';
+export function getStaticPaths() { return languages.map(lang => ({ params: { lang } })); }
+const { lang } = Astro.params;
+if (!isLang(lang)) return Astro.redirect('/es/');
+---
+<BaseLayout lang={lang} title="Normas de Loopi"><section class="page-wrap text-page"><p class="eyebrow">Comunidad segura</p><h1>Normas de Loopi</h1><p class="intro">Loopi es un espacio para compartir historias con respeto. Todos los envíos y comentarios se revisan antes de ser visibles.</p><div class="rules"><section><h2>Lo que sí tiene lugar aquí</h2><p>Historias personales, recuerdos, reflexiones y conversaciones respetuosas. Puedes usar tu nombre, un seudónimo o publicar de forma anónima.</p></section><section><h2>Lo que no publicamos</h2><p>Insultos, amenazas, acoso, lenguaje de odio, publicidad, enlaces sospechosos, contenido sexual con menores o información privada de otras personas.</p></section><section><h2>Cuida tu privacidad</h2><p>No compartas direcciones, teléfonos, contraseñas, documentos ni datos que identifiquen a otra persona. Puedes pedir que Loopi cambie nombres, lugares o detalles antes de publicar.</p></section><section><h2>Edad mínima</h2><p>Para enviar historias o comentarios debes tener 16 años o más. Si ves algo preocupante, no interactúes: repórtalo mediante el formulario correspondiente.</p></section></div></section></BaseLayout>
+<style>.text-page{max-width:840px}.text-page h1{font:800 49px 'Plus Jakarta Sans';letter-spacing:-.07em;margin:8px 0}.intro{font-size:17px;color:var(--muted);max-width:700px}.rules{margin-top:35px}.rules section{padding:19px 0;border-top:1px solid var(--line)}.rules h2{font:800 21px 'Plus Jakarta Sans';letter-spacing:-.04em;margin:0}.rules p{color:var(--muted);font-size:14px;max-width:680px}</style>
