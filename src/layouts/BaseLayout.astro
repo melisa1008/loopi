@@ -26,7 +26,7 @@ const { lang, title = 'Loopi — Comparte tu mundo', description = 'Una comunida
 </html>
 <script>
   if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+    window.addEventListener('load', () => navigator.serviceWorker.getRegistrations().then(registrations => Promise.all(registrations.map(registration => registration.unregister()))));
   }
 </script>
 <style is:global>
