@@ -7,11 +7,10 @@ body:
     attributes:
       value: "Esta acción quitará la historia de la web. Solo la dueña de Loopi puede enviarla."
   - type: input
-    id: link
+    id: title
     attributes:
-      label: Enlace de la historia
-      description: "Copia la dirección completa de la historia que quieres eliminar."
-      placeholder: "https://melisa1008.github.io/es/historias/mi-historia/"
+      label: Título de la historia
+      description: "Escríbelo exactamente como aparece publicado."
     validations: { required: true }
   - type: dropdown
     id: confirmation

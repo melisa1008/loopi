@@ -17,12 +17,15 @@ jobs:
         with:
           script: |
             const body = context.payload.issue.body || '';
-            const link = body.match(/### Enlace de la historia\s*\n\s*([^\n]+)/)?.[1]?.trim() || '';
-            const match = link.match(/\/(es|en|fr)\/historias\/([^/?#]+)/);
-            if (!match) core.setFailed('El enlace de la historia no es válido.');
-            const [, language, slug] = match;
-            const path = `src/content/stories/${language}/${slug}.md`;
-            const file = await github.rest.repos.getContent({ owner: context.repo.owner, repo: context.repo.repo, path, ref: 'main' });
+            const title = body.match(/### Título de la historia\s*\n\s*([^\n]+)/)?.[1]?.trim() || '';
+            const slug = title.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+            if (!slug) core.setFailed('El título de la historia no es válido.');
+            const paths = ['es', 'en', 'fr'].map(language => `src/content/stories/${language}/${slug}.md`);
+            let path, file;
+            for (const candidate of paths) {
+              try { file = await github.rest.repos.getContent({ owner: context.repo.owner, repo: context.repo.repo, path: candidate, ref: 'main' }); path = candidate; break; } catch {}
+            }
+            if (!file || !path) core.setFailed('No encontramos una historia con ese título.');
             await github.rest.repos.deleteFile({ owner: context.repo.owner, repo: context.repo.repo, path, sha: file.data.sha, message: `Eliminar historia: ${slug}`, branch: 'main' });
             await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body: '🗑️ Historia eliminada. Loopi se actualizará automáticamente en unos minutos.' });
             await github.rest.issues.update({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, state: 'closed' });
