@@ -62,7 +62,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
   if (!isSupabaseConfigured) { setup.hidden = false; loginCard.hidden = true; }
   else {
-    loginForm.addEventListener('submit', async event => { event.preventDefault(); const email = (document.querySelector<HTMLInputElement>('#email')!).value; loginMessage.textContent = 'Enviando…'; const { error } = await supabase!.auth.signInWithOtp({ email, options: { emailRedirectTo: `${window.location.origin}/admin/` } }); loginMessage.textContent = error ? 'No se pudo enviar el enlace.' : 'Revisa tu correo y abre el enlace para entrar.'; });
+    loginForm.addEventListener('submit', async event => { event.preventDefault(); const email = (document.querySelector<HTMLInputElement>('#email')!).value; loginMessage.textContent = 'Enviando…'; const { error } = await supabase!.auth.signInWithOtp({ email, options: { emailRedirectTo: `${window.location.origin}/admin/` } }); loginMessage.textContent = error ? `No se pudo enviar el enlace: ${error.message}` : 'Revisa tu correo y abre el enlace para entrar.'; });
     document.querySelector('#refresh')!.addEventListener('click', loadStories);
     document.querySelector('#logout')!.addEventListener('click', async () => { await supabase!.auth.signOut(); dashboard.hidden = true; loginCard.hidden = false; });
     document.querySelectorAll<HTMLButtonElement>('[data-filter]').forEach(button => button.addEventListener('click', () => { filter = button.dataset.filter!; document.querySelectorAll('[data-filter]').forEach(item => item.classList.toggle('active', item === button)); loadStories(); }));
