@@ -6,6 +6,14 @@
 
 Cuando vuelvas, escribe esta palabra clave y revisaremos esta guía para continuar desde el estado actual.
 
+### Estado guardado — 30 de septiembre de 2026
+
+- Se corrigió y publicó la interfaz multilingüe de Loopi.
+- Idiomas internos disponibles: español (`/es/`), inglés (`/en/`), francés (`/fr/`), portugués (`/pt/`), italiano (`/it/`) y alemán (`/de/`).
+- Portada, navegación, categorías, envío, normas, privacidad y pie de página están traducidos en esos seis idiomas.
+- Las historias mantienen su idioma original hasta contar con una traducción humana revisada.
+- Los cambios están publicados en GitHub (`f3437b8`); la web puede tardar hasta 5 minutos en actualizarse.
+
 ## Enlaces importantes
 
 - Web pública: https://melisa1008.github.io/
