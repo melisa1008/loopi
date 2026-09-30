@@ -1,0 +1,33 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { isLang, languages } from '../../lib/i18n';
+export function getStaticPaths() { return languages.map(lang => ({ params: { lang } })); }
+const { lang } = Astro.params;
+if (!isLang(lang)) return Astro.redirect('/es/');
+---
+<BaseLayout lang={lang} title="Historia — Loopi" description="Una historia de la comunidad Loopi.">
+  <article class="story page-wrap" data-language={lang}>
+    <a class="back" href={`/${lang}/historias/`}>← Todas las historias</a>
+    <p id="loading" class="loading">Cargando historia…</p>
+    <div id="content" hidden><header><p id="meta" class="eyebrow"></p><h1 id="title"></h1><p id="author" class="author"></p></header><div id="body" class="body"></div></div>
+  </article>
+</BaseLayout>
+<script>
+  import { supabase } from '../../lib/supabase';
+  const content = document.querySelector<HTMLElement>('#content')!;
+  const loading = document.querySelector<HTMLElement>('#loading')!;
+  const id = new URLSearchParams(window.location.search).get('id');
+  if (!supabase || !id) loading.textContent = 'Esta historia no está disponible.';
+  else {
+    const { data, error } = await supabase.from('stories').select('title, body, category, author, is_anonymous, published_at').eq('id', id).single();
+    if (error || !data) loading.textContent = 'Esta historia no existe o ya no está publicada.';
+    else {
+      document.querySelector('#title')!.textContent = data.title;
+      document.querySelector('#meta')!.textContent = `${data.category} · ${new Date(data.published_at).toLocaleDateString()}`;
+      document.querySelector('#author')!.textContent = `Por ${data.is_anonymous ? 'Anónimo' : data.author}`;
+      document.querySelector('#body')!.textContent = data.body;
+      loading.hidden = true; content.hidden = false;
+    }
+  }
+</script>
+<style>.story{max-width:800px}.back{display:inline-block;color:var(--purple);font-size:12px;font-weight:800;margin-bottom:33px}.loading{color:var(--muted)}.story header{border-bottom:1px solid var(--line);padding-bottom:28px}.story h1{font:800 clamp(36px,6vw,58px)/1.04 'Plus Jakarta Sans';letter-spacing:-.07em;margin:8px 0 18px}.author{color:var(--muted);font-size:13px}.body{white-space:pre-wrap;font-size:17px;line-height:1.8;padding:36px 0}</style>

@@ -2,7 +2,6 @@
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { localeFromId, slugFromId, formatDate, type Lang } from '../../../lib/i18n';
-import { commentFormUrl } from '../../../lib/loopi';
 export async function getStaticPaths() {
   const stories = await getCollection('stories', ({ data }) => !data.draft);
   return stories.map(story => ({ params: { lang: localeFromId(story.id), slug: slugFromId(story.id) }, props: { story } }));
@@ -10,7 +9,6 @@ export async function getStaticPaths() {
 const { story } = Astro.props;
 const lang = Astro.params.lang as Lang;
 const { Content } = await render(story);
-const commentUrl = commentFormUrl ? `${commentFormUrl}${commentFormUrl.includes('?') ? '&' : '?'}story=${encodeURIComponent(story.slug)}` : '';
 ---
 <BaseLayout lang={lang} title={`${story.data.title} — Loopi`} description={story.data.excerpt}>
   <article class="story page-wrap">
@@ -19,7 +17,7 @@ const commentUrl = commentFormUrl ? `${commentFormUrl}${commentFormUrl.includes(
     <div class="prose"><Content /></div>
     <div class="tags">{story.data.tags.map(tag => <span>#{tag}</span>)}</div>
     <section class="comments" id="comentarios"><p class="eyebrow">Conversación</p><h2>Comentarios</h2><p>Los comentarios y las respuestas se revisan antes de aparecer para cuidar este espacio.</p>
-      {commentUrl ? <a class="button" href={commentUrl} target="_blank" rel="noopener">Dejar un comentario →</a> : <div class="form-pending"><b>Comentarios próximamente</b><span>El formulario de comentarios se activará cuando Loopi conecte su buzón de moderación.</span></div>}
+      <div class="form-pending"><b>Comentarios próximamente</b><span>Loopi preparará los comentarios en su propio sistema de moderación.</span></div>
     </section>
   </article>
 </BaseLayout>

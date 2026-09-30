@@ -20,6 +20,21 @@ const copy = {
 <BaseLayout lang={lang} title={copy.title} description={copy.intro}>
   <section class="page-wrap"><p class="eyebrow">{copy.eyebrow}</p><h1>{copy.heading}</h1><p class="intro">{copy.intro}</p>
   <div class="filters">{categories.map(category => <a id={category.id} href={`#${category.id}`}>{category.emoji} {category.label}</a>)}</div>
-  <div class="stories">{stories.map(story => <article><p class="meta">{story.data.category} · {formatDate(story.data.date, lang)}</p><h2><a href={`/${story.data.language}/historias/${story.slug}/`}>{story.data.title}</a></h2><p>{story.data.excerpt}</p><footer><span>{story.data.author}</span><span>{story.data.tags.map(tag => `#${tag}`).join(' ')}</span></footer></article>)}</div></section>
+  <div class="stories">{stories.map(story => <article><p class="meta">{story.data.category} · {formatDate(story.data.date, lang)}</p><h2><a href={`/${story.data.language}/historias/${story.slug}/`}>{story.data.title}</a></h2><p>{story.data.excerpt}</p><footer><span>{story.data.author}</span><span>{story.data.tags.map(tag => `#${tag}`).join(' ')}</span></footer></article>)}</div><div id="published-stories" class="stories remote" data-language={lang}></div></section>
 </BaseLayout>
-<style>.page-wrap h1{font:800 45px 'Plus Jakarta Sans';letter-spacing:-.07em;margin:7px 0}.intro{color:var(--muted);font-size:16px;max-width:650px}.filters{display:flex;gap:8px;flex-wrap:wrap;margin:31px 0}.filters a{background:var(--lilac);border-radius:20px;padding:7px 11px;color:var(--ink);font-size:11px;font-weight:700}.stories{display:grid;grid-template-columns:repeat(2,1fr);gap:15px}.stories article{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:23px}.meta{margin:0;color:var(--purple);text-transform:capitalize;font-size:10px;font-weight:800}.stories h2{font:800 22px/1.2 'Plus Jakarta Sans';letter-spacing:-.05em;margin:9px 0}.stories article>p:not(.meta){margin:0;color:var(--muted)}.stories footer{display:flex;justify-content:space-between;gap:10px;padding:17px 0 0;margin-top:18px;border-top:1px solid var(--line);font-size:11px;color:var(--muted)}@media(max-width:650px){.page-wrap h1{font-size:36px}.stories{grid-template-columns:1fr}.stories footer{display:block}.stories footer span+span{display:block;margin-top:5px}}</style>
+<script>
+  import { supabase } from '../../../lib/supabase';
+  const container = document.querySelector<HTMLElement>('#published-stories');
+  if (supabase && container) {
+    const { data } = await supabase.from('stories').select('id, title, body, category, author, is_anonymous, published_at').eq('language', container.dataset.language!).order('published_at', { ascending: false });
+    data?.forEach(story => {
+      const article = document.createElement('article');
+      const meta = document.createElement('p'); meta.className = 'meta'; meta.textContent = `${story.category} · ${new Date(story.published_at).toLocaleDateString()}`;
+      const heading = document.createElement('h2'); const link = document.createElement('a'); link.href = `/${container.dataset.language}/leer/?id=${encodeURIComponent(story.id)}`; link.textContent = story.title; heading.append(link);
+      const excerpt = document.createElement('p'); excerpt.textContent = story.body.length > 180 ? `${story.body.slice(0, 180)}…` : story.body;
+      const footer = document.createElement('footer'); const author = document.createElement('span'); author.textContent = story.is_anonymous ? 'Anónimo' : story.author; footer.append(author);
+      article.append(meta, heading, excerpt, footer); container.append(article);
+    });
+  }
+</script>
+<style>.page-wrap h1{font:800 45px 'Plus Jakarta Sans';letter-spacing:-.07em;margin:7px 0}.intro{color:var(--muted);font-size:16px;max-width:650px}.filters{display:flex;gap:8px;flex-wrap:wrap;margin:31px 0}.filters a{background:var(--lilac);border-radius:20px;padding:7px 11px;color:var(--ink);font-size:11px;font-weight:700}.stories{display:grid;grid-template-columns:repeat(2,1fr);gap:15px}.remote{margin-top:15px}.stories article{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:23px}.meta{margin:0;color:var(--purple);text-transform:capitalize;font-size:10px;font-weight:800}.stories h2{font:800 22px/1.2 'Plus Jakarta Sans';letter-spacing:-.05em;margin:9px 0}.stories article>p:not(.meta){margin:0;color:var(--muted)}.stories footer{display:flex;justify-content:space-between;gap:10px;padding:17px 0 0;margin-top:18px;border-top:1px solid var(--line);font-size:11px;color:var(--muted)}@media(max-width:650px){.page-wrap h1{font-size:36px}.stories{grid-template-columns:1fr}.stories footer{display:block}.stories footer span+span{display:block;margin-top:5px}}</style>

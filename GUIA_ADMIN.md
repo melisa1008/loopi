@@ -13,6 +13,7 @@ Cuando vuelvas, escribe esta palabra clave y revisaremos esta guía para continu
 - Portada, navegación, categorías, envío, normas, privacidad y pie de página están traducidos en esos seis idiomas.
 - Las historias mantienen su idioma original hasta contar con una traducción humana revisada.
 - Los cambios están publicados en GitHub (`f3437b8`); la web puede tardar hasta 5 minutos en actualizarse.
+- Se preparó un sistema de envíos y moderación dentro de Loopi mediante Supabase. Falta realizar la configuración inicial indicada en `README.md` antes de que esté conectado.
 
 ## Enlaces importantes
 
@@ -25,21 +26,11 @@ Cuando vuelvas, escribe esta palabra clave y revisaremos esta guía para continu
 
 No se necesita Linux ni usar comandos.
 
-### Publicar una historia
+### Moderar una historia
 
-1. Abre el panel de administración.
-2. Pulsa **Abrir formulario de publicación**.
-3. Inicia sesión con la cuenta de GitHub `melisa1008`.
-4. Completa el formulario y pulsa **Create**.
-
-### Eliminar una historia
-
-1. Abre el panel de administración.
-2. Pulsa **Eliminar una historia**.
-3. Escribe el título exacto de la historia.
-4. Confirma y pulsa **Create**.
-
-Las publicaciones y eliminaciones suelen aparecer en la web en 1 a 3 minutos; espera hasta 5 minutos.
+1. Abre Loopi Admin (`/admin/`) e inicia sesión con el correo de administradora.
+2. En **Pendientes**, lee el envío y usa **Corregir**, **Publicar**, **Rechazar** o **Eliminar**.
+3. Las historias publicadas aparecen dentro de Loopi, sin Google Forms ni GitHub.
 
 ## Aplicaciones en el teléfono
 

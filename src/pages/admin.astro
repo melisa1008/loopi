@@ -1,0 +1,72 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout lang="es" title="Loopi Admin — Moderación privada" description="Panel privado de administración de Loopi.">
+  <section class="page-wrap admin-page">
+    <a class="back" href="/es/">← Volver a Loopi</a>
+    <p class="eyebrow">Zona privada</p><h1>Loopi Admin</h1>
+    <p class="intro">Revisa, corrige, publica o elimina historias sin salir de Loopi.</p>
+
+    <div id="setup" class="notice" hidden>Conecta Supabase para activar el panel. Consulta <code>.env.example</code> y <code>supabase/schema.sql</code>.</div>
+    <section id="login-card" class="panel"><h2>Entrar como administradora</h2><p>Escribe tu correo. Recibirás un enlace seguro para abrir este mismo panel.</p><form id="login-form"><label>Correo de administración<input id="email" type="email" required autocomplete="email" /></label><button class="button" type="submit">Enviar enlace de acceso</button><p class="message" aria-live="polite"></p></form></section>
+
+    <section id="dashboard" hidden>
+      <div class="dashboard-head"><div><p id="admin-email" class="muted"></p><h2>Historias recibidas</h2></div><div><button id="refresh" class="secondary">Actualizar</button><button id="logout" class="secondary">Salir</button></div></div>
+      <div class="filters"><button data-filter="pending" class="active">Pendientes</button><button data-filter="published">Publicadas</button><button data-filter="rejected">Rechazadas</button></div>
+      <p id="list-message" class="message" aria-live="polite"></p><div id="stories" class="stories"></div>
+    </section>
+  </section>
+</BaseLayout>
+
+<script>
+  import { supabase, isSupabaseConfigured } from '../lib/supabase';
+  type Story = { id: string; title: string; body: string; category: string; language: string; author: string; is_anonymous: boolean; privacy_request: string | null; contact_email: string | null; status: string; created_at: string };
+  const setup = document.querySelector<HTMLElement>('#setup')!;
+  const loginCard = document.querySelector<HTMLElement>('#login-card')!;
+  const dashboard = document.querySelector<HTMLElement>('#dashboard')!;
+  const loginForm = document.querySelector<HTMLFormElement>('#login-form')!;
+  const loginMessage = loginForm.querySelector<HTMLElement>('.message')!;
+  const list = document.querySelector<HTMLElement>('#stories')!;
+  const listMessage = document.querySelector<HTMLElement>('#list-message')!;
+  let filter = 'pending';
+
+  const text = (tag: string, value: string, className = '') => { const element = document.createElement(tag); element.textContent = value; element.className = className; return element; };
+  async function loadStories() {
+    if (!supabase) return;
+    list.innerHTML = ''; listMessage.textContent = 'Cargando…';
+    const { data, error } = await supabase.from('stories').select('*').eq('status', filter).order('created_at', { ascending: false });
+    if (error) { listMessage.textContent = 'No tienes permiso para ver los envíos. Comprueba que tu usuario esté añadido como administradora.'; return; }
+    listMessage.textContent = data.length ? '' : 'No hay historias en esta sección.';
+    data.forEach((story: Story) => renderStory(story));
+  }
+  function renderStory(story: Story) {
+    const card = document.createElement('article'); card.className = 'story-card';
+    const meta = new Date(story.created_at).toLocaleString('es-ES', { dateStyle: 'medium', timeStyle: 'short' });
+    card.append(text('p', `${story.category} · ${story.language.toUpperCase()} · ${meta}`, 'meta'), text('h3', story.title), text('p', `Por: ${story.is_anonymous ? 'Anónimo' : story.author}`, 'author'), text('p', story.body, 'body'));
+    if (story.privacy_request) card.append(text('p', `Solicitud de privacidad: ${story.privacy_request}`, 'private'));
+    if (story.contact_email) card.append(text('p', `Correo privado: ${story.contact_email}`, 'private'));
+    const actions = document.createElement('div'); actions.className = 'actions';
+    const edit = document.createElement('button'); edit.textContent = 'Corregir'; edit.className = 'secondary'; edit.onclick = async () => {
+      const title = prompt('Título:', story.title); if (title === null) return;
+      const body = prompt('Historia:', story.body); if (body === null) return;
+      await update(story.id, { title: title.trim(), body: body.trim() });
+    };
+    actions.append(edit);
+    if (story.status !== 'published') { const publish = document.createElement('button'); publish.textContent = 'Publicar'; publish.className = 'button'; publish.onclick = () => update(story.id, { status: 'published', published_at: new Date().toISOString() }); actions.append(publish); }
+    if (story.status !== 'rejected') { const reject = document.createElement('button'); reject.textContent = 'Rechazar'; reject.className = 'secondary'; reject.onclick = () => update(story.id, { status: 'rejected' }); actions.append(reject); }
+    const remove = document.createElement('button'); remove.textContent = 'Eliminar'; remove.className = 'danger'; remove.onclick = async () => { if (confirm('¿Eliminar esta historia definitivamente? Esta acción no se puede deshacer.')) { const { error } = await supabase!.from('stories').delete().eq('id', story.id); if (error) listMessage.textContent = 'No se pudo eliminar.'; await loadStories(); } };
+    actions.append(remove); card.append(actions); list.append(card);
+  }
+  async function update(id: string, values: Record<string, string>) { const { error } = await supabase!.from('stories').update(values).eq('id', id); if (error) listMessage.textContent = 'No se pudo guardar el cambio.'; await loadStories(); }
+  async function showDashboard() { const { data: { user } } = await supabase!.auth.getUser(); if (!user) return; loginCard.hidden = true; dashboard.hidden = false; document.querySelector('#admin-email')!.textContent = user.email || ''; await loadStories(); }
+
+  if (!isSupabaseConfigured) { setup.hidden = false; loginCard.hidden = true; }
+  else {
+    loginForm.addEventListener('submit', async event => { event.preventDefault(); const email = (document.querySelector<HTMLInputElement>('#email')!).value; loginMessage.textContent = 'Enviando…'; const { error } = await supabase!.auth.signInWithOtp({ email, options: { emailRedirectTo: `${window.location.origin}/admin/` } }); loginMessage.textContent = error ? 'No se pudo enviar el enlace.' : 'Revisa tu correo y abre el enlace para entrar.'; });
+    document.querySelector('#refresh')!.addEventListener('click', loadStories);
+    document.querySelector('#logout')!.addEventListener('click', async () => { await supabase!.auth.signOut(); dashboard.hidden = true; loginCard.hidden = false; });
+    document.querySelectorAll<HTMLButtonElement>('[data-filter]').forEach(button => button.addEventListener('click', () => { filter = button.dataset.filter!; document.querySelectorAll('[data-filter]').forEach(item => item.classList.toggle('active', item === button)); loadStories(); }));
+    supabase!.auth.onAuthStateChange((_event, session) => { if (session) showDashboard(); }); showDashboard();
+  }
+</script>
+<style>.admin-page{max-width:960px}.back{display:inline-block;color:var(--purple);font-size:12px;font-weight:800;margin-bottom:28px}.admin-page h1{font:800 50px 'Plus Jakarta Sans';letter-spacing:-.07em;margin:5px 0}.intro,.muted{color:var(--muted)}.panel,.story-card,.notice{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:24px}.panel{max-width:520px;margin-top:28px}.panel h2,.dashboard-head h2{font:800 24px 'Plus Jakarta Sans';letter-spacing:-.05em;margin:0 0 5px}.panel p{color:var(--muted);font-size:13px}.panel form{display:grid;gap:12px}.panel label{display:grid;gap:5px;font-size:12px;font-weight:700}.panel input{border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:8px;padding:10px}.panel button{border:0}.notice{margin-top:25px}.dashboard-head{display:flex;justify-content:space-between;align-items:end;margin-top:30px}.dashboard-head div:last-child,.actions{display:flex;gap:8px;flex-wrap:wrap}.secondary,.danger,.filters button{border:1px solid var(--line);background:var(--lilac);color:var(--ink);border-radius:9px;padding:10px 13px;font-weight:700}.danger{color:#ffb1a5}.filters{display:flex;gap:8px;margin:20px 0}.filters .active{background:var(--purple);border-color:var(--purple);color:white}.stories{display:grid;gap:14px}.story-card h3{font:800 22px 'Plus Jakarta Sans';letter-spacing:-.04em;margin:8px 0}.story-card .meta{color:var(--purple);font-size:11px;font-weight:800;margin:0}.author{color:var(--muted);font-size:12px}.body{white-space:pre-wrap;line-height:1.7}.private{padding:9px;background:var(--paper);border-radius:8px;color:#f5cdb4;font-size:12px}.actions{padding-top:16px;margin-top:18px;border-top:1px solid var(--line)}.actions .button{border:0}.message{min-height:18px;color:var(--purple);font-size:12px}@media(max-width:600px){.admin-page h1{font-size:38px}.dashboard-head{align-items:start;flex-direction:column;gap:12px}}</style>

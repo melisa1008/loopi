@@ -26,32 +26,23 @@ Para crear la versión publicable:
 npm run build
 ```
 
-## Conectar formularios de Google
+## Envíos y moderación dentro de Loopi
 
-La web no guarda historias ni comentarios por sí misma. Esto evita exponer datos privados en la página estática. Crea dos formularios de Google desde tu propia cuenta:
+Loopi usa Supabase para recibir historias y moderarlas desde `/admin/`, sin Google Forms ni GitHub. La web pública solo puede leer historias con estado `published`; los envíos nuevos quedan en `pending`.
 
-1. **Historias:** título, historia, categoría, idioma, nombre/seudónimo opcional, publicación anónima, petición de cambiar detalles, correo opcional, confirmación de tener 16+ años y aceptación de normas.
-2. **Comentarios:** historia a la que responde, comentario, nombre/seudónimo opcional, publicación anónima, correo opcional y aceptación de normas.
+### Configuración inicial (una sola vez)
 
-Configura los formularios para recibir notificaciones por correo y que las respuestas se guarden en hojas de cálculo privadas. Después:
+1. Crea un proyecto gratuito en [Supabase](https://supabase.com).
+2. En **SQL Editor**, ejecuta el contenido completo de `supabase/schema.sql`.
+3. Copia `.env.example` como `.env` y completa `PUBLIC_SUPABASE_URL` y `PUBLIC_SUPABASE_ANON_KEY` desde **Settings → API**.
+4. En **Authentication → URL Configuration**, añade `https://melisa1008.github.io/admin/` a las URL de redirección permitidas (y la URL local si vas a probar en tu ordenador).
+5. Publica Loopi y entra una vez en `/admin/` con tu correo. En **Authentication → Users**, copia el UUID que se haya creado y ejecuta la última instrucción de `supabase/schema.sql` para convertir esa cuenta en administradora.
+6. Añade las mismas dos variables de entorno en la configuración de tu alojamiento antes de publicar.
 
-1. Copia `.env.example` a `.env`.
-2. Pega el enlace de cada formulario en su variable correspondiente.
-3. Vuelve a publicar la web.
+La clave anónima es pública por diseño. Nunca uses ni publiques la clave `service_role`: las reglas de la base de datos protegen los envíos y permiten moderar solo a tu cuenta administradora.
 
-No subas `.env` ni compartas contraseñas, hojas privadas ni enlaces de edición.
+### Uso diario
 
-## Moderación privada
-
-Tu cuenta de Google será la única con acceso de edición a las hojas de respuestas. En cada una crea o usa una columna `Estado` con estos valores:
-
-- `Nuevo`
-- `Por revisar`
-- `Aceptado y publicado`
-- `Rechazado`
-
-El panel visual con esos estados y la publicación automática al aprobar requieren una integración segura adicional entre la hoja privada y el sitio publicado. No debe implementarse solo en el navegador, porque expondría tus datos de moderación. Esta primera versión deja la web pública lista y no publica ningún envío automáticamente.
-
-## Añadir una historia aprobada
-
-Las historias públicas están en `src/content/stories/`. Cada archivo Markdown incluye título, texto, autor visible, categoría, etiquetas, idioma y fecha. Crea o actualiza solo contenido que ya hayas aprobado.
+- Las personas envían historias en `/es/enviar/` (o cualquier idioma de Loopi).
+- Tú inicias sesión en `/admin/` y puedes corregir, publicar, rechazar o eliminar cada historia.
+- Al publicarla, queda disponible en la portada y en la sección de historias sin crear archivos Markdown ni salir de Loopi.

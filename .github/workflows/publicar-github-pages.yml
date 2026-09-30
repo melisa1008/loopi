@@ -17,6 +17,11 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    # Son valores públicos requeridos por el navegador. La seguridad de los
+    # envíos está en las políticas RLS de Supabase, no en esta clave.
+    env:
+      PUBLIC_SUPABASE_URL: https://hpcjamchbafagpcgojpw.supabase.co
+      PUBLIC_SUPABASE_ANON_KEY: sb_publishable_aIJ63E2bAsR3x3idK3ZzOQ_N8GugQtU
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

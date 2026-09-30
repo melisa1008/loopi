@@ -25,8 +25,6 @@ export function categoriesForLanguage(lang: keyof typeof categoryTranslations) {
   return categories.map((category, index) => ({ ...category, label: categoryTranslations[lang][index] }));
 }
 
-export const storyFormUrl = import.meta.env.PUBLIC_LOOPI_STORY_FORM_URL || 'https://docs.google.com/forms/d/e/1FAIpQLSc3vY8zmNe9wJJFikw9RCX9PEVdkZGoFoRBzTLN5pvZWVcovg/viewform?usp=publish-editor';
-export const commentFormUrl = import.meta.env.PUBLIC_LOOPI_COMMENT_FORM_URL || '';
 
 export const translationLanguages = [
   ['es', 'Español'], ['en', 'English'], ['fr', 'Français'], ['pt', 'Português'],
