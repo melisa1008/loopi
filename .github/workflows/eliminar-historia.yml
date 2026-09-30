@@ -31,5 +31,6 @@ jobs:
             }
             if (!file || !path) { core.setFailed('No encontramos una historia con ese título.'); return; }
             await github.rest.repos.deleteFile({ owner: context.repo.owner, repo: context.repo.repo, path, sha: file.data.sha, message: `Eliminar historia: ${title}`, branch: 'main' });
+            await github.rest.actions.createWorkflowDispatch({ owner: context.repo.owner, repo: context.repo.repo, workflow_id: 'publicar-github-pages.yml', ref: 'main' });
             await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body: '🗑️ Historia eliminada. Loopi se actualizará automáticamente en unos minutos.' });
             await github.rest.issues.update({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, state: 'closed' });

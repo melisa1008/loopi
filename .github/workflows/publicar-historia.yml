@@ -32,5 +32,6 @@ jobs:
             const date = new Date().toISOString().slice(0, 10);
             const content = ['---', `title: ${JSON.stringify(title)}`, `excerpt: ${JSON.stringify(excerpt)}`, `date: ${date}`, `author: ${JSON.stringify(author)}`, `category: ${JSON.stringify(category)}`, `tags: [${tags.map(tag => JSON.stringify(tag)).join(', ')}]`, 'featured: false', 'language: es', 'draft: false', '---', '', story, ''].join('\n');
             await github.rest.repos.createOrUpdateFileContents({ owner: context.repo.owner, repo: context.repo.repo, path: `src/content/stories/es/${slug}.md`, message: `Publicar historia: ${title}`, content: Buffer.from(content).toString('base64'), branch: 'main' });
+            await github.rest.actions.createWorkflowDispatch({ owner: context.repo.owner, repo: context.repo.repo, workflow_id: 'publicar-github-pages.yml', ref: 'main' });
             await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body: '✅ Historia publicada. Loopi se actualizará automáticamente en unos minutos.' });
             await github.rest.issues.update({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, state: 'closed' });
