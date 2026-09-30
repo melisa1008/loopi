@@ -2,7 +2,7 @@ name: Eliminar historia de Loopi
 
 on:
   issues:
-    types: [opened]
+    types: [opened, reopened]
 
 permissions:
   contents: write
@@ -18,14 +18,18 @@ jobs:
           script: |
             const body = context.payload.issue.body || '';
             const title = body.match(/### Título de la historia\s*\n\s*([^\n]+)/)?.[1]?.trim() || '';
-            const slug = title.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-            if (!slug) core.setFailed('El título de la historia no es válido.');
-            const paths = ['es', 'en', 'fr'].map(language => `src/content/stories/${language}/${slug}.md`);
+            const normalize = value => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+            if (!title) { core.setFailed('El título de la historia no es válido.'); return; }
+            const tree = await github.rest.git.getTree({ owner: context.repo.owner, repo: context.repo.repo, tree_sha: 'main', recursive: 'true' });
+            const candidates = tree.data.tree.filter(item => item.type === 'blob' && /^src\/content\/stories\/(es|en|fr)\/.*\.md$/.test(item.path));
             let path, file;
-            for (const candidate of paths) {
-              try { file = await github.rest.repos.getContent({ owner: context.repo.owner, repo: context.repo.repo, path: candidate, ref: 'main' }); path = candidate; break; } catch {}
+            for (const candidate of candidates) {
+              const content = await github.rest.repos.getContent({ owner: context.repo.owner, repo: context.repo.repo, path: candidate.path, ref: 'main' });
+              const source = Buffer.from(content.data.content, 'base64').toString('utf8');
+              const found = source.match(/^title:\s*"(.+)"$/m)?.[1];
+              if (found && normalize(found) === normalize(title)) { path = candidate.path; file = content; break; }
             }
-            if (!file || !path) core.setFailed('No encontramos una historia con ese título.');
-            await github.rest.repos.deleteFile({ owner: context.repo.owner, repo: context.repo.repo, path, sha: file.data.sha, message: `Eliminar historia: ${slug}`, branch: 'main' });
+            if (!file || !path) { core.setFailed('No encontramos una historia con ese título.'); return; }
+            await github.rest.repos.deleteFile({ owner: context.repo.owner, repo: context.repo.repo, path, sha: file.data.sha, message: `Eliminar historia: ${title}`, branch: 'main' });
             await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body: '🗑️ Historia eliminada. Loopi se actualizará automáticamente en unos minutos.' });
             await github.rest.issues.update({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, state: 'closed' });
